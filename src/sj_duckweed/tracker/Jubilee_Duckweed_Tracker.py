@@ -5,7 +5,6 @@ from pathlib import Path
 
 import duckweed_segment_and_track
 import numpy as np
-import yaml
 
 from science_jubilee.decks.Deck import Deck
 from science_jubilee.hal.motion_driver import MotionDriver
@@ -25,12 +24,6 @@ driver = MotionDriver(transport)
 tool_changer = ToolChanger(transport)
 deck = Deck(os.getenv("JUBILEE_DECK_DEF", "lab_automation_deck_AFL_bolton.json"))
 nav = DeckNavigator(driver, deck=deck)
-"""
-intrinsics= REPO_ROOT/ "science_jubilee/Vision/Camera_calibration/src/camera_params.yaml"
-with open(intrinsics, "r", encoding="utf-8") as handle:
-            loaded = yaml.safe_load(handle) or {}
-            intrinsics= loaded["camera"]
-"""
 offest_sup = (-10,10,18) #supplementary offset spécific to the selected tool
 def deck_clear():
     return True

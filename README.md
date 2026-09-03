@@ -61,9 +61,3 @@ Moves the camera to the source well, runs the vision pipeline
 (`sj_duckweed.ingredients.pipeline`) to locate a duckweed frond, plans an
 RRT pickup path, then drives the inoculator to pick it up and transfer it to
 the destination wells.
-
-## Known pre-existing issues (carried over from the mother repo, not fixed by this move)
-
-- `tracker/Jubilee_Duckweed_Tracker.py` has a dead (commented-out) block
-  referencing a nonexistent `science_jubilee/Vision/Camera_calibration`
-  path — was already broken/unused before the split.
