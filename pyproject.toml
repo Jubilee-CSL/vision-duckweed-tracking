@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vision-duckweed-tracking"
+version = "0.1.0"
+description = "Computer-vision plugin for science-jubilee: duckweed frond detection, pose estimation and RRT-based pickup path planning"
+requires-python = ">=3.10"
+dependencies = [
+    "science-jubilee>=0.0.0",
+    "sacred",
+    "numpy",
+    "opencv-contrib-python-headless",
+    "imageio",
+    "pyyaml",
+]
+
+[project.scripts]
+run_duckweed = "sj_duckweed.scripts.run_duckweed_tracker:run"
+run_duckweed_tracker = "sj_duckweed.scripts.run_duckweed_tracker:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
+log_cli_format = "%(asctime)s [%(levelname)s] %(message)s"
+markers = [
+    "vision: integration tests for the duckweed vision pipeline",
+]

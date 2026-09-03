@@ -1,0 +1,8 @@
+sacred
+numpy
+opencv-contrib-python-headless
+imageio
+pyyaml
+
+# optional: interactive debug breakpoints in the pipeline (ipdb.set_trace)
+ipdb
