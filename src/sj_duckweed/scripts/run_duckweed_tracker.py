@@ -53,7 +53,7 @@ def config():
     ]  # tool-specific machine-frame XYZ correction (mm)
     z_imaging = 200.0  # Z height for camera above reservoir centre
     image_settle = 3.0  # seconds to wait after moving before capture
-
+    debug=True
 
 def _camera_to_machine(base_xyz, cam_offset_xyz, point_xyz, supplementary_xyz):
     """Convert camera-frame point to machine frame with sign convention used by tracker."""
@@ -102,6 +102,8 @@ def main(_config, _run):
 
     cam = session.camera
 
+    nav.move_to_z(200)
+
     # ── 1. Resolve source well and destination wells from deck ────────────
     source_well = nav.get_well(cfg["source_slot"], "A1")  # reservoir has one well
     dest_wells = nav.get_wells_in_slot(cfg["dest_slot"])
@@ -121,6 +123,7 @@ def main(_config, _run):
         x_imaging = float(source_well.x)
         y_imaging = float(source_well.y - cam.offset[1])
         z_imaging = float(cfg["z_imaging"])
+
         cam.move_to_get_image(x_imaging, y_imaging, z_imaging)
         time.sleep(cfg["image_settle"])
         if not cfg["hardware"]:
@@ -131,6 +134,10 @@ def main(_config, _run):
             logging.info(
                 "Mock mode enabled | injected image: %s", cfg["mock_image_path"]
             )
+        
+        cam.focus_mode("single")
+        time.sleep(0.5)
+        cam.trigger_focus()
         img = cam.get_image()
         logging.info("Image acquired | shape=%s dtype=%s", img.shape, img.dtype)
 
@@ -158,6 +165,8 @@ def main(_config, _run):
                 debug_capture=cfg["pipeline"]["debug_capture"],
                 debug_breakpoints=cfg["pipeline"]["debug_breakpoints"],
                 debug_dir=cfg["pipeline"]["debug_dir"],
+                debug_float=cfg["float_detection"]["debug_float"],
+                debug_segmentation=cfg["segmentation"]["debug_segmentation"]
             )
         )
         if duckweed_3d is None:
@@ -235,9 +244,9 @@ def main(_config, _run):
                 well=source_well_tracking, dx=dx_start, dy=dy_start, speed_xy=400
             )
             nav.move_inside_well(
-                well=source_well_tracking, z=z_target + 17, speed_z=200
+                well=source_well_tracking, z=z_target + 10, speed_z=200
             )
-            nav.move_inside_well(well=source_well_tracking, z=z_target + 7, speed_z=100)
+            nav.move_inside_well(well=source_well_tracking, z=z_target, speed_z=100)
 
             prev_wx, prev_wy, _ = world_checkpoints[0]
             for wx, wy, _ in world_checkpoints[1:]:
@@ -249,7 +258,7 @@ def main(_config, _run):
                 prev_wx, prev_wy = wx, wy
 
             nav.move_inside_well(
-                well=source_well_tracking, z=z_target + 20, speed_z=200
+                well=source_well_tracking, z=z_target + 10, speed_z=200
             )
             nav.move_inside_well(
                 well=source_well_tracking, z=z_target + 70, speed_z=800
@@ -264,9 +273,9 @@ def main(_config, _run):
                 well=source_well_tracking, dx=dx, dy=dy + 8, speed_xy=600
             )
             nav.move_inside_well(
-                well=source_well_tracking, z=z_target + 17, speed_z=200
+                well=source_well_tracking, z=z_target + 10, speed_z=200
             )
-            nav.move_inside_well(well=source_well_tracking, z=z_target + 7, speed_z=50)
+            nav.move_inside_well(well=source_well_tracking, z=z_target, speed_z=50)
             nav.move_inside_well(well=source_well_tracking, dy=-6, speed_xy=200)
             nav.move_inside_well(well=source_well_tracking, dx=+1, speed_xy=50)
             nav.move_inside_well(well=source_well_tracking, dx=-1, dy=+1, speed_xy=50)

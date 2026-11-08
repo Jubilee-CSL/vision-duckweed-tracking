@@ -59,10 +59,11 @@ def config():
     insertion_margin_mm = 15.0
     target_margin_mm = 3.0
     tool_radius_mm = 1.27
-    water_level_offset_mm = 1.5
+    water_level_offset_mm = 1.5  # float top above the water surface (mm)
     debug_capture = False
     debug_breakpoints = False
     debug_dir = ""
+    
 
 
 @pipeline.capture
@@ -88,6 +89,8 @@ def run_pipeline(
     debug_capture,
     debug_breakpoints,
     debug_dir,
+    debug_float,
+    debug_segmentation
 ):
     """Duckweed pipeline.
 
@@ -128,11 +131,13 @@ def run_pipeline(
             threshold_blue=threshold_blue,
             min_area_px=min_area_px,
             min_circularity=min_circularity,
+            debug_float=debug_float,
         )
         tvec = estimate_float_pose(
             camera, float_det.points, float_radius_mm=float_radius_mm
         )
-        water_level = tvec[2] - float(water_level_offset_mm)
+        # The camera sees the float's top; the water is that much farther away.
+        water_level = tvec[2] + float(water_level_offset_mm)
         float_center_3d = tvec
 
         if float_det.radius_px <= 0:
@@ -174,12 +179,14 @@ def run_pipeline(
         return None, None, checkpoints_3d, None, {}
 
     if use_ai:
-        valid_contours = get_img_contour_cellpose(img, diameter=cellpose_diameter)
+        valid_contours = get_img_contour_cellpose(
+            img, diameter=cellpose_diameter, debug_segmentation=debug_segmentation
+        )
         logger.info(
             "Segmentation mode: Cellpose (AI), contours=%d", len(valid_contours)
         )
     else:
-        valid_contours = get_img_contour(img)
+        valid_contours = get_img_contour(img, debug_segmentation=debug_segmentation)
         logger.info(
             "Segmentation mode: ExG (classic), contours=%d", len(valid_contours)
         )
